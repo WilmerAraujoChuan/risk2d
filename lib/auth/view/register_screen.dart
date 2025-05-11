@@ -11,13 +11,20 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _surnameController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  String? _gender;
   bool _isLoading = false;
 
   @override
   void dispose() {
+    _nameController.dispose();
+    _surnameController.dispose();
+    _phoneController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -45,19 +52,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset('assets/app/logo.png', height: 150),
-                const SizedBox(height: 40),
                 Text(
                   'Crea tu cuenta',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w600,
-                    color: const Color.from(
-                      alpha: 1,
-                      red: 0.259,
-                      green: 0.259,
-                      blue: 0.259,
-                    ),
+                    color: const Color.fromARGB(255, 66, 66, 66),
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -71,6 +71,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   key: _formKey,
                   child: Column(
                     children: [
+                      CustomTextFormField(
+                        controller: _nameController,
+                        label: 'Nombres',
+                        icon: Icons.person,
+                        iconColor: AppColors.primary,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tus nombres';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      CustomTextFormField(
+                        controller: _surnameController,
+                        label: 'Apellidos',
+                        icon: Icons.person_outline,
+                        iconColor: AppColors.primary,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tus apellidos';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      CustomTextFormField(
+                        controller: _phoneController,
+                        label: 'Teléfono',
+                        icon: Icons.phone,
+                        iconColor: AppColors.primary,
+                        keyboardType: TextInputType.phone,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Ingresa tu número de teléfono';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
                       CustomTextFormField(
                         controller: _emailController,
                         label: 'Correo electrónico',
@@ -119,6 +159,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           }
                           if (value != _passwordController.text) {
                             return 'Las contraseñas no coinciden';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      DropdownButtonFormField<String>(
+                        value: _gender,
+                        decoration: InputDecoration(
+                          labelText: 'Sexo',
+                          icon: Icon(Icons.transgender),
+                          iconColor: AppColors.primary,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        items:
+                            <String>[
+                              'Masculino',
+                              'Femenino',
+                            ].map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _gender = newValue;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Selecciona tu sexo';
                           }
                           return null;
                         },
