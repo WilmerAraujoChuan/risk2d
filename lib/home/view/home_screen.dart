@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:risk2d/cuestionario/view/diabetes_risk_questionnarie.dart';
 
 class HomeContent extends StatelessWidget {
   const HomeContent({super.key});
@@ -235,7 +236,10 @@ class HomeContent extends StatelessWidget {
           shadowColor: Theme.of(context).primaryColor.withOpacity(0.3),
         ),
         onPressed: () {
-          // Navegar a la pantalla de test
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const DiabetesRiskQuestionnaire()),
+          );
         },
       ),
     );
