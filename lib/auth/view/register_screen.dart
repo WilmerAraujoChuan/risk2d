@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:risk2d/common/values/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:risk2d/common/colors.dart';
 import 'package:risk2d/auth/widget/custom_text_form_field.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -31,14 +33,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  // Código 2 - RegisterScreen actualizado
+  Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      Future.delayed(const Duration(seconds: 2), () {
+      try {
+        // ... código existente ...
+      } on FirebaseAuthException catch (e) {
+        String message;
+        switch (e.code) {
+          case 'email-already-in-use':
+            message =
+                'Este correo ya está registrado. ¿Olvidaste tu contraseña?';
+            break;
+          case 'invalid-email':
+            message = 'Correo electrónico inválido';
+            break;
+          case 'weak-password':
+            message = 'La contraseña debe tener al menos 6 caracteres';
+            break;
+          case 'operation-not-allowed':
+            message = 'Operación no permitida. Contacta al soporte';
+            break;
+          default:
+            message = 'Error de registro: ${e.message}';
+        }
+        _showError(message);
+      } catch (e) {
+        _showError('Error inesperado: $e');
+      } finally {
         if (mounted) setState(() => _isLoading = false);
-        Navigator.pop(context);
-      });
+      }
     }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.white),
+            SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: EdgeInsets.all(20),
+        duration: Duration(seconds: 4),
+      ),
+    );
   }
 
   @override

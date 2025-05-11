@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:risk2d/common/colors.dart'; // Asegúrate de tener definido AppColors.error
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
@@ -44,11 +45,23 @@ class CustomTextFormField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF6C63FF), width: 1.5),
+          borderSide: const BorderSide(
+            color: AppColors.primary, // Usar el color primario de tu tema
+            width: 1.5,
+          ),
+        ),
+        errorStyle: TextStyle(
+          color: AppColors.error,
+          fontWeight: FontWeight.w500,
+          fontSize: 13,
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.redAccent),
+          borderSide: BorderSide(color: AppColors.error, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: AppColors.error, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,

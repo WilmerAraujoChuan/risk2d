@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:risk2d/common/values/colors.dart';
 import 'package:risk2d/auth/view/register_screen.dart';
 import 'package:risk2d/auth/widget/custom_text_form_field.dart';
+import 'package:risk2d/common/colors.dart';
+import 'package:risk2d/home/view/home_screen.dart';
+import 'package:risk2d/home/widget/opciones_view.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  
   @override
   void dispose() {
     _emailController.dispose();
@@ -26,37 +28,50 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+      try {
+        // Iniciar sesión con Firebase
+        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
 
-    setState(() => _isLoading = true);
-
-    try {
-      await _auth.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      // Navegar a pantalla principal
-      if (mounted) Navigator.pushReplacementNamed(context, '/home');
-    } on FirebaseAuthException catch (e) {
-      _handleError(e);
-    } catch (e) {
-      _showError('Error desconocido: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+        // Navegar a HomeScreen después de iniciar sesión
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const OpcionesView(),
+            ), // Navegación directa a HomeScreen
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        _handleError(e);
+      } catch (e) {
+        _showError('Error desconocido: $e');
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
+      }
     }
   }
 
+  // Código 1 - LoginScreen actualizado
   void _handleError(FirebaseAuthException e) {
     String message;
     switch (e.code) {
       case 'user-not-found':
-        message = 'Usuario no encontrado';
-        break;
       case 'wrong-password':
-        message = 'Contraseña incorrecta';
+        message = 'Credenciales incorrectas. Verifica tu correo y contraseña';
         break;
       case 'invalid-email':
-        message = 'Correo electrónico inválido';
+        message = 'Formato de correo electrónico inválido';
+        break;
+      case 'user-disabled':
+        message = 'Tu cuenta ha sido desactivada. Contacta al soporte';
+        break;
+      case 'too-many-requests':
+        message = 'Demasiados intentos. Intenta nuevamente más tarde';
         break;
       default:
         message = 'Error de autenticación: ${e.message}';
@@ -66,7 +81,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: AppColors.error),
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.white),
+            SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: EdgeInsets.all(20),
+        duration: Duration(seconds: 4),
+      ),
     );
   }
 
