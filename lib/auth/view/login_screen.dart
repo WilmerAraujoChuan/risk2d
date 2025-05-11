@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:risk2d/common/values/colors.dart';
-import 'package:risk2d/home/view/register_screen.dart';
-import 'package:risk2d/home/widget/custom_text_form_field.dart';
+import 'package:risk2d/auth/view/register_screen.dart';
+import 'package:risk2d/auth/widget/custom_text_form_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

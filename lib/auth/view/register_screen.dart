@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:risk2d/common/values/colors.dart';
-import 'package:risk2d/home/widget/custom_text_form_field.dart';
+import 'package:risk2d/auth/widget/custom_text_form_field.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
