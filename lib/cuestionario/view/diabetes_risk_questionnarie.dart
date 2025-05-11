@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class DiabetesRiskQuestionnaire extends StatefulWidget {
@@ -14,6 +16,8 @@ class _DiabetesRiskQuestionnaireState extends State<DiabetesRiskQuestionnaire> {
   late DateTime _startTime;
   Duration _duration = Duration.zero;
   final PageController _pageController = PageController();
+  List<Map<String, dynamic>> _respuestas = [];
+
   final List<Question> _questions = [
     Question(
       text: "1. Edad",
@@ -87,6 +91,7 @@ class _DiabetesRiskQuestionnaireState extends State<DiabetesRiskQuestionnaire> {
   void initState() {
     super.initState();
     _startTime = DateTime.now();
+    _respuestas = List.generate(_questions.length, (index) => {});
   }
 
   @override
@@ -215,6 +220,11 @@ class _DiabetesRiskQuestionnaireState extends State<DiabetesRiskQuestionnaire> {
         onChanged: (value) {
           setState(() {
             _totalScore += value!;
+            _respuestas[_currentPage] = {
+              'pregunta': _questions[_currentPage].text,
+              'respuesta': answer.text,
+              'puntos': answer.points,
+            };
             _handleNavigation();
           });
         },
@@ -316,6 +326,20 @@ class _DiabetesRiskQuestionnaireState extends State<DiabetesRiskQuestionnaire> {
   void _showResults() {
     final endTime = DateTime.now();
     _duration = endTime.difference(_startTime);
+    final user = FirebaseAuth.instance.currentUser;
+
+    try {
+      FirebaseFirestore.instance.collection('cuestionarios').add({
+        'userId': user?.uid,
+        'fecha': FieldValue.serverTimestamp(),
+        'duracionSegundos': _duration.inSeconds,
+        'puntajeTotal': _totalScore,
+        'preguntas': _respuestas,
+        'nivelRiesgo': _calculateRisk(),
+      });
+    } catch (e) {
+      print('Error guardando cuestionario: $e');
+    }
 
     showDialog(
       context: context,
@@ -373,7 +397,10 @@ class _DiabetesRiskQuestionnaireState extends State<DiabetesRiskQuestionnaire> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                        Navigator.pop(context); // Cerrar diálogo
+                        Navigator.pop(context); // Regresar a pantalla anterior
+                      },
                       child: const Text("Entendido"),
                     ),
                   ),
