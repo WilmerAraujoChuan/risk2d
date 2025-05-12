@@ -19,9 +19,16 @@ dependencies:
   google_generative_ai: ^0.4.6
   gradient_borders: ^1.0.1
 
+  flutter_launcher_icons: ^0.14.3
+
   flutter_svg: ^2.1.0
   flutter_keyboard_visibility: ^6.0.0
   cupertino_icons: ^1.0.8
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/app/logo.png"
 
 dev_dependencies:
   flutter_test:
@@ -36,6 +43,8 @@ flutter:
     - assets/app/dietas.png
     - assets/app/ejercicios.jpg
     - assets/app/empty-state.png
+    - assets/
+    - assets/app/
 
   uses-material-design: true
 
