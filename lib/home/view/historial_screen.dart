@@ -14,78 +14,74 @@ class HistorialScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Historial de Evaluaciones',
-          style: TextStyle(fontWeight: FontWeight.w500),
+          style: TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0.5),
         ),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.grey[800],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance
-                .collection('cuestionarios')
-                .where('userId', isEqualTo: user?.uid)
-                .orderBy('fecha', descending: true)
-                .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.grey[50]!, Colors.grey[100]!],
+          ),
+        ),
+        child: StreamBuilder<QuerySnapshot>(
+          stream:
+              FirebaseFirestore.instance
+                  .collection('cuestionarios')
+                  .where('userId', isEqualTo: user?.uid)
+                  .orderBy('fecha', descending: true)
+                  .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return _buildErrorState(snapshot.error.toString());
+            }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return _buildLoadingState();
+            }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.assessment_outlined,
-                    size: 50,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'No hay evaluaciones registradas',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                  ),
-                ],
-              ),
+            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              return _buildEmptyState();
+            }
+
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
+              physics: const BouncingScrollPhysics(),
+              itemCount: snapshot.data!.docs.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final doc = snapshot.data!.docs[index];
+                final data = doc.data() as Map<String, dynamic>;
+
+                final fecha =
+                    data['fecha'] != null
+                        ? (data['fecha'] as Timestamp).toDate()
+                        : DateTime.now();
+                final nivelRiesgo = data['nivelRiesgo'] as String;
+                final puntaje = data['puntajeTotal'] as int;
+                final duracion = data['duracionSegundos'] as int;
+
+                return _buildEvaluationCard(
+                  fecha: fecha,
+                  nivelRiesgo: nivelRiesgo,
+                  puntaje: puntaje,
+                  duracion: duracion,
+                  context: context,
+                );
+              },
             );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            itemCount: snapshot.data!.docs.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
-              final data = doc.data() as Map<String, dynamic>;
-
-              final fecha =
-                  data['fecha'] != null
-                      ? (data['fecha'] as Timestamp).toDate()
-                      : DateTime.now();
-              final nivelRiesgo = data['nivelRiesgo'] as String;
-              final puntaje = data['puntajeTotal'] as int;
-              final duracion = data['duracionSegundos'] as int;
-
-              return _buildHistorialItem(
-                fecha: fecha,
-                nivelRiesgo: nivelRiesgo,
-                puntaje: puntaje,
-                duracion: duracion,
-                context: context,
-              );
-            },
-          );
-        },
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildHistorialItem({
+  Widget _buildEvaluationCard({
     required DateTime fecha,
     required String nivelRiesgo,
     required int puntaje,
@@ -96,58 +92,96 @@ class HistorialScreen extends StatelessWidget {
     final formattedTime =
         '${duracion ~/ 60}:${(duracion % 60).toString().padLeft(2, '0')}';
 
-    return Material(
-      color: Colors.white,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  DateFormat('dd MMM yyyy').format(fecha),
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                Flexible(
+                  child: Text(
+                    DateFormat('EEE, d MMM yyyy').format(fecha),
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: color.withOpacity(0.3)),
-                  ),
-                  child: Text(
-                    nivelRiesgo.split(' ')[0],
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 140),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          color.withOpacity(0.15),
+                          color.withOpacity(0.05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: IntrinsicWidth(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _getRiskIcon(nivelRiesgo),
+                            size: 14,
+                            color: color,
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              nivelRiesgo,
+                              softWrap: true,
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildMetricItem(
-                  icon: Icons.bar_chart_rounded,
+                _buildMetricTile(
+                  icon: Icons.assessment_outlined,
                   color: color,
-                  value: '$puntaje Puntos',
+                  title: 'Puntaje',
+                  value: '$puntaje',
                 ),
-                const SizedBox(width: 20),
-                _buildMetricItem(
+                _buildMetricTile(
                   icon: Icons.timer_outlined,
                   color: Colors.blueGrey,
+                  title: 'Duración',
                   value: formattedTime,
                 ),
               ],
@@ -158,30 +192,142 @@ class HistorialScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMetricItem({
+  Widget _buildMetricTile({
     required IconData icon,
     required Color color,
+    required String title,
     required String value,
   }) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: color),
-        const SizedBox(width: 8),
-        Text(
-          value,
-          style: TextStyle(
-            color: Colors.grey[800],
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
           ),
+          child: Icon(icon, size: 20, color: color),
+        ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: TextStyle(
+                color: Colors.grey[800],
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.assignment_outlined, size: 80, color: Colors.grey[400]),
+            const SizedBox(height: 24),
+            Text(
+              'No hay evaluaciones registradas',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Completa tu primera evaluación para ver tus resultados aquí',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey[500], fontSize: 14),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 20),
+          Text(
+            'Cargando historial...',
+            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline_rounded,
+              size: 48,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Error al cargar el historial',
+              style: TextStyle(
+                color: Colors.grey[800],
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Reintentar'),
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Color _getRiskColor(String nivelRiesgo) {
-    if (nivelRiesgo.contains('Bajo')) return Colors.green;
-    if (nivelRiesgo.contains('moderado')) return Colors.orange;
-    return Colors.red;
+    if (nivelRiesgo.contains('Bajo')) return const Color(0xFF00C853);
+    if (nivelRiesgo.contains('moderado')) return const Color(0xFFFFAB00);
+    return const Color(0xFFD50000);
+  }
+
+  IconData _getRiskIcon(String nivelRiesgo) {
+    if (nivelRiesgo.contains('Bajo')) return Icons.check_circle_outline_rounded;
+    if (nivelRiesgo.contains('moderado')) return Icons.warning_amber_rounded;
+    return Icons.error_outline_rounded;
   }
 }

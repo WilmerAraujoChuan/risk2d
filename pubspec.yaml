@@ -34,6 +34,7 @@ flutter:
     - assets/app/menu.jpg
     - assets/app/dietas.png
     - assets/app/ejercicios.jpg
+    - assets/app/empty-state.png
 
   uses-material-design: true
 
