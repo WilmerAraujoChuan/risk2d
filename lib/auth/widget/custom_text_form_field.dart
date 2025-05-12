@@ -11,6 +11,7 @@ class CustomTextFormField extends StatelessWidget {
   final Color? iconColor;
   final bool filled;
   final Color? fillColor;
+  final Widget? suffixIcon; // ✅ NUEVO parámetro
 
   const CustomTextFormField({
     super.key,
@@ -23,6 +24,7 @@ class CustomTextFormField extends StatelessWidget {
     this.iconColor,
     this.filled = false,
     this.fillColor,
+    this.suffixIcon, // ✅ Añadir al constructor
   });
 
   @override
@@ -39,6 +41,7 @@ class CustomTextFormField extends StatelessWidget {
             icon != null
                 ? Icon(icon, color: iconColor ?? Colors.grey[600])
                 : null,
+        suffixIcon: suffixIcon, // ✅ Agregado aquí
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey[300]!),
