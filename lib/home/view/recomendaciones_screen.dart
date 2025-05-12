@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:risk2d/recomendaciones/view/ejercicios_view.dart';
+import 'package:risk2d/recomendaciones/view/menu_semanal_view.dart';
 import 'package:risk2d/recomendaciones/view/tecnicas_dietas_view.dart';
 
 class RecomendacionesScreen extends StatelessWidget {
@@ -206,10 +208,10 @@ class RecomendacionesScreen extends StatelessWidget {
         Navigator.push(context, MaterialPageRoute(builder: (_) => TecnicasDietasScreen()));
         break;
       case 'menu':
-        // Navigator.push(context, MaterialPageRoute(builder: (_) => MenuScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => MenuSemanalScreen()));
         break;
       case 'ejercicios':
-        // Navigator.push(context, MaterialPageRoute(builder: (_) => EjerciciosScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => EjerciciosScreen()));
         break;
     }
   }
