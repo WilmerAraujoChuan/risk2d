@@ -38,7 +38,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        // ... código existente ...
+        // Crear un nuevo usuario con el correo y la contraseña
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim(),
+            );
+
+        // Guardar información adicional en Firestore
+        await FirebaseFirestore.instance
+            .collection('usuarios')
+            .doc(userCredential.user?.uid)
+            .set({
+              'nombres': _nameController.text.trim(),
+              'apellidos': _surnameController.text.trim(),
+              'correo': _emailController.text.trim(),
+              'telefono': _phoneController.text.trim(),
+              'sexo': _gender,
+            });
+
+        // Mostrar mensaje de éxito
+        _showSuccess('Registro exitoso. ¡Bienvenido!');
+
+        // Esperar un momento antes de retroceder
+        await Future.delayed(Duration(seconds: 2));
+
+        // Retroceder a la pantalla anterior después de un registro exitoso
+        Navigator.pop(context);
       } on FirebaseAuthException catch (e) {
         String message;
         switch (e.code) {
@@ -65,6 +91,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (mounted) setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _showSuccess(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white),
+            SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: EdgeInsets.all(20),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   void _showError(String message) {

@@ -17,6 +17,7 @@ dependencies:
   shared_preferences: ^2.5.3
   intl: ^0.20.2
   google_generative_ai: ^0.4.6
+  gradient_borders: ^1.0.1
 
   flutter_svg: ^2.1.0
   flutter_keyboard_visibility: ^6.0.0

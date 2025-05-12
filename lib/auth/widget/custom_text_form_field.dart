@@ -9,6 +9,8 @@ class CustomTextFormField extends StatelessWidget {
   final String? Function(String?)? validator;
   final IconData? icon;
   final Color? iconColor;
+  final bool filled;
+  final Color? fillColor;
 
   const CustomTextFormField({
     super.key,
@@ -19,6 +21,8 @@ class CustomTextFormField extends StatelessWidget {
     this.validator,
     this.icon,
     this.iconColor,
+    this.filled = false,
+    this.fillColor,
   });
 
   @override
@@ -45,10 +49,7 @@ class CustomTextFormField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.primary, // Usar el color primario de tu tema
-            width: 1.5,
-          ),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         errorStyle: TextStyle(
           color: AppColors.error,
@@ -67,8 +68,8 @@ class CustomTextFormField extends StatelessWidget {
           horizontal: 16,
           vertical: 18,
         ),
-        filled: true,
-        fillColor: Colors.white,
+        filled: filled,
+        fillColor: fillColor ?? Colors.white,
       ),
       validator: validator,
     );

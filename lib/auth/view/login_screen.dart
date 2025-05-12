@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:risk2d/auth/view/register_screen.dart';
 import 'package:risk2d/auth/widget/custom_text_form_field.dart';
 import 'package:risk2d/common/colors.dart';
-import 'package:risk2d/home/view/home_screen.dart';
 import 'package:risk2d/home/widget/opciones_view.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -31,50 +30,46 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        // Iniciar sesión con Firebase
         UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
 
-        // Navegar a HomeScreen después de iniciar sesión
         if (mounted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const OpcionesView(),
-            ), // Navegación directa a HomeScreen
+            MaterialPageRoute(builder: (context) => const OpcionesView()),
           );
         }
       } on FirebaseAuthException catch (e) {
         _handleError(e);
       } catch (e) {
-        _showError('Error desconocido: $e');
+        _showError('Error desconocido: ');
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
     }
   }
 
-  // Código 1 - LoginScreen actualizado
   void _handleError(FirebaseAuthException e) {
     String message;
     switch (e.code) {
       case 'user-not-found':
       case 'wrong-password':
-        message = 'Credenciales incorrectas. Verifica tu correo y contraseña';
+        message = 'Revise su correo y contraseña.';
         break;
       case 'invalid-email':
-        message = 'Formato de correo electrónico inválido';
+        message = 'Formato de correo electrónico inválido.';
         break;
       case 'user-disabled':
-        message = 'Tu cuenta ha sido desactivada. Contacta al soporte';
+        message = 'Tu cuenta ha sido desactivada. Contacta al soporte.';
         break;
       case 'too-many-requests':
-        message = 'Demasiados intentos. Intenta nuevamente más tarde';
+        message =
+            'Demasiados intentos de inicio de sesión. Intenta nuevamente más tarde.';
         break;
       default:
-        message = 'Error de autenticación: ${e.message}';
+        message = 'Error de autenticación: Revise su correo o contraseña';
     }
     _showError(message);
   }
@@ -173,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: _isLoading ? null : _submit,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            elevation: 0,
+                            elevation: 5,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
