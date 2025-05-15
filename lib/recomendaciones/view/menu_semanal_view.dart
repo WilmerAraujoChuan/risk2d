@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:risk2d/core/api.dart';
 
 class MenuSemanalScreen extends StatefulWidget {
   const MenuSemanalScreen({super.key});
@@ -101,7 +102,7 @@ NO INCLUIR:
       _updateProgress(0.7, "Generando con IA...");
       final model = GenerativeModel(
         model: 'gemini-2.0-flash',
-        apiKey: 'AIzaSyAV13FIkcL91rLpj2Yswj-WLq9mpDF7ERQ',
+        apiKey: GEMINI_API_KEY,
         generationConfig: GenerationConfig(
           maxOutputTokens: 2000,
           temperature: 0.3,
@@ -132,7 +133,7 @@ Formato requerido:
           _isLoading = false;
         });
         debugPrint('Respuesta cruda de Gemini:');
-        debugPrint(_menuSemanal); // Verificar estructura real
+        debugPrint(_menuSemanal);
       }
     } catch (e) {
       _handleError("Error en el proceso: ${e.toString()}");
