@@ -110,7 +110,6 @@ class RecomendacionesScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             child: Stack(
               children: [
-                // Fondo adaptable
                 Positioned.fill(
                   child: ShaderMask(
                     shaderCallback: (rect) {
@@ -134,7 +133,6 @@ class RecomendacionesScreen extends StatelessWidget {
                   ),
                 ),
 
-                // Contenido responsive
                 Padding(
                   padding: EdgeInsets.all(screenWidth * 0.05),
                   child: Column(
@@ -202,7 +200,6 @@ class RecomendacionesScreen extends StatelessWidget {
   }
 
   void _navigateToDetail(BuildContext context, String type) {
-    // Navegación a pantallas específicas
     switch (type) {
       case 'dietas':
         Navigator.push(context, MaterialPageRoute(builder: (_) => TecnicasDietasScreen()));

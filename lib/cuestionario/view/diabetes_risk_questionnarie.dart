@@ -398,8 +398,8 @@ class _DiabetesRiskQuestionnaireState extends State<DiabetesRiskQuestionnaire> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pop(context); // Cerrar diálogo
-                        Navigator.pop(context); // Regresar a pantalla anterior
+                        Navigator.pop(context);
+                        Navigator.pop(context);
                       },
                       child: const Text("Entendido"),
                     ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:risk2d/common/colors.dart'; // Asegúrate de tener definido AppColors.error
+import 'package:risk2d/common/colors.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
@@ -11,7 +11,7 @@ class CustomTextFormField extends StatelessWidget {
   final Color? iconColor;
   final bool filled;
   final Color? fillColor;
-  final Widget? suffixIcon; // ✅ NUEVO parámetro
+  final Widget? suffixIcon;
 
   const CustomTextFormField({
     super.key,
@@ -24,7 +24,7 @@ class CustomTextFormField extends StatelessWidget {
     this.iconColor,
     this.filled = false,
     this.fillColor,
-    this.suffixIcon, // ✅ Añadir al constructor
+    this.suffixIcon,
   });
 
   @override
@@ -41,7 +41,7 @@ class CustomTextFormField extends StatelessWidget {
             icon != null
                 ? Icon(icon, color: iconColor ?? Colors.grey[600])
                 : null,
-        suffixIcon: suffixIcon, // ✅ Agregado aquí
+        suffixIcon: suffixIcon,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey[300]!),

@@ -60,10 +60,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         await Future.delayed(const Duration(seconds: 2));
         if (mounted) Navigator.pop(context);
       } on FirebaseAuthException catch (e) {
-        print('FirebaseAuthException: ${e.code}'); // Agregado para depuración
+        print('FirebaseAuthException: ${e.code}');
         _handleError(e);
       } catch (e) {
-        print('Error inesperado: $e'); // Agregado para depuración
+        print('Error inesperado: $e');
         _showError('Error inesperado: $e');
       } finally {
         if (mounted) setState(() => _isLoading = false);

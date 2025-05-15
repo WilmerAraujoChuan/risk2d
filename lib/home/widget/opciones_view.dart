@@ -36,7 +36,6 @@ class _OpcionesViewState extends State<OpcionesView> {
         (Route<dynamic> route) => false,
       );
     } catch (e) {
-      // Manejo de errores
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error al cerrar sesión: $e')));
@@ -50,7 +49,7 @@ class _OpcionesViewState extends State<OpcionesView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: _signOut, // Llama a la función de cierre de sesión
+            onPressed: _signOut,
             tooltip: 'Cerrar sesión',
           ),
         ],
